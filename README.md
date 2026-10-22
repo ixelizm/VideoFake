@@ -16,6 +16,6 @@ The repository provides a user-friendly and interactive Colab notebook that guid
 
 1. Open the notebook with a **GPU** runtime (`Runtime → Change runtime type → GPU`).
 2. Run cells in order.
-3. Upload your own `face.jpg` / `input_video.mp4` (or change paths in cell 4), then run.
+3. Cell **4** asks you to upload the face image and target video.
 
 Do **not** install `nvidia-cudnn` via apt — Colab already ships CUDA/cuDNN; the old package conflicts with `libcudnn9` / CUDA 13.
