@@ -206,11 +206,11 @@ def start() -> None:
     # clean temp
     update_status('Cleaning temporary resources...')
     clean_temp(roop.globals.target_path)
-    # validate video
-    if is_video(roop.globals.target_path):
-        update_status('Processing to video succeed!')
+    # validate output (not the input target)
+    if is_video(roop.globals.output_path) and os.path.getsize(roop.globals.output_path) > 0:
+        update_status(f'Processing to video succeed! -> {roop.globals.output_path}')
     else:
-        update_status('Processing to video failed!')
+        update_status(f'Processing to video failed! Missing/empty: {roop.globals.output_path}')
 
 
 def destroy() -> None:
