@@ -114,6 +114,8 @@ def main() -> None:
     print("Python:", sys.version, flush=True)
 
     print("\n=== 1/3 Core packages ===", flush=True)
+    # Force ORT 1.19.x (newer builds hit cuDNN Frontend HEURISTIC_QUERY_FAILED on T4)
+    pip_install("--force-reinstall", "--no-deps", "onnxruntime-gpu==1.19.2")
     pip_install("-r", str(root / "requirements-colab.txt"))
 
     print("\n=== 2/3 face_enhancer deps (no heavy transitive installs) ===", flush=True)

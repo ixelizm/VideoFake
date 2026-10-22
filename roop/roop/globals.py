@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Any, List, Optional
 
 source_path: Optional[str] = None
 target_path: Optional[str] = None
@@ -17,6 +17,6 @@ temp_frame_quality: Optional[int] = None
 output_video_encoder: Optional[str] = None
 output_video_quality: Optional[int] = None
 max_memory: Optional[int] = None
-execution_providers: List[str] = []
+execution_providers: List[Any] = []
 execution_threads: Optional[int] = None
 log_level: str = 'error'

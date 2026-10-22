@@ -27,10 +27,19 @@ def get_face_enhancer() -> Any:
     return FACE_ENHANCER
 
 
+def _has_execution_provider(name: str) -> bool:
+    for provider in roop.globals.execution_providers:
+        if provider == name:
+            return True
+        if isinstance(provider, (list, tuple)) and provider and provider[0] == name:
+            return True
+    return False
+
+
 def get_device() -> str:
-    if 'CUDAExecutionProvider' in roop.globals.execution_providers:
+    if _has_execution_provider('CUDAExecutionProvider'):
         return 'cuda'
-    if 'CoreMLExecutionProvider' in roop.globals.execution_providers:
+    if _has_execution_provider('CoreMLExecutionProvider'):
         return 'mps'
     return 'cpu'
 

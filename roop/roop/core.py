@@ -77,9 +77,23 @@ def encode_execution_providers(execution_providers: List[str]) -> List[str]:
     return [execution_provider.replace('ExecutionProvider', '').lower() for execution_provider in execution_providers]
 
 
-def decode_execution_providers(execution_providers: List[str]) -> List[str]:
-    return [provider for provider, encoded_execution_provider in zip(onnxruntime.get_available_providers(), encode_execution_providers(onnxruntime.get_available_providers()))
-            if any(execution_provider in encoded_execution_provider for execution_provider in execution_providers)]
+def decode_execution_providers(execution_providers: List[str]) -> List:
+    # Prefer stable CUDA options on Colab T4 (sm_75): EXHAUSTIVE + cuDNN FE often fails.
+    cuda_options = {
+        'device_id': 0,
+        'arena_extend_strategy': 'kSameAsRequested',
+        'cudnn_conv_algo_search': 'DEFAULT',
+        'do_copy_in_default_stream': True,
+    }
+    selected = []
+    available = onnxruntime.get_available_providers()
+    for provider, encoded in zip(available, encode_execution_providers(available)):
+        if any(choice in encoded for choice in execution_providers):
+            if provider == 'CUDAExecutionProvider':
+                selected.append((provider, cuda_options))
+            else:
+                selected.append(provider)
+    return selected
 
 
 def suggest_execution_providers() -> List[str]:
@@ -88,17 +102,18 @@ def suggest_execution_providers() -> List[str]:
 
 def suggest_execution_threads() -> int:
     if 'CUDAExecutionProvider' in onnxruntime.get_available_providers():
-        return 8
+        return 4
     return 1
 
 
 def limit_resources() -> None:
-    # prevent tensorflow memory leak
-    gpus = tensorflow.config.experimental.list_physical_devices('GPU')
-    for gpu in gpus:
-        tensorflow.config.experimental.set_virtual_device_configuration(gpu, [
-            tensorflow.config.experimental.VirtualDeviceConfiguration(memory_limit=1024)
-        ])
+    # Keep TF from grabbing most of the GPU before onnxruntime runs
+    try:
+        gpus = tensorflow.config.experimental.list_physical_devices('GPU')
+        for gpu in gpus:
+            tensorflow.config.experimental.set_memory_growth(gpu, True)
+    except Exception:
+        pass
     # limit memory usage
     if roop.globals.max_memory:
         memory = roop.globals.max_memory * 1024 ** 3
