@@ -114,9 +114,13 @@ def main() -> None:
     print("Python:", sys.version, flush=True)
 
     print("\n=== 1/3 Core packages ===", flush=True)
-    # Force ORT 1.19.x (newer builds hit cuDNN Frontend HEURISTIC_QUERY_FAILED on T4)
-    pip_install("--force-reinstall", "--no-deps", "onnxruntime-gpu==1.19.2")
-    pip_install("-r", str(root / "requirements-colab.txt"))
+    # Fresh ORT install (Python 3.13 needs >=1.20 wheels)
+    subprocess.call([sys.executable, "-m", "pip", "uninstall", "-y", "onnxruntime", "onnxruntime-gpu"])
+    try:
+        pip_install("-r", str(root / "requirements-colab.txt"))
+    except subprocess.CalledProcessError:
+        # Retry core-only if enhancer side deps flake
+        pip_install("onnxruntime-gpu>=1.20.0", "onnx>=1.16.0", "insightface==0.7.3", "opencv-python-headless", "psutil", "pillow", "protobuf", "tqdm", "cython")
 
     print("\n=== 2/3 face_enhancer deps (no heavy transitive installs) ===", flush=True)
     basicsr_dir = pathlib.Path("/content/BasicSR")

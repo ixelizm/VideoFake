@@ -1,9 +1,7 @@
-# Core Colab deps only (Python 3.12+/3.13, CUDA 12/13).
+# Colab: Python 3.13 needs onnxruntime-gpu>=1.20 (1.19.x has no cp313 wheels).
 # Do not pin torch/tensorflow/numpy — Colab already provides them.
-# gfpgan/basicsr/facexlib are installed by the notebook cell (Python 3.13 patch).
 
-# 1.19.x avoids cuDNN Frontend path that breaks on Colab T4 (sm_75) with cuDNN 9.x
-onnxruntime-gpu==1.19.2
+onnxruntime-gpu>=1.20.0
 onnx>=1.16.0
 insightface==0.7.3
 opencv-python-headless>=4.8.0,<5.1.0

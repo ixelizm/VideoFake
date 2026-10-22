@@ -78,12 +78,14 @@ def encode_execution_providers(execution_providers: List[str]) -> List[str]:
 
 
 def decode_execution_providers(execution_providers: List[str]) -> List:
-    # Prefer stable CUDA options on Colab T4 (sm_75): EXHAUSTIVE + cuDNN FE often fails.
+    # Colab T4 + cuDNN 9: EXHAUSTIVE search often crashes; cap GPU arena to avoid bad allocs.
     cuda_options = {
         'device_id': 0,
         'arena_extend_strategy': 'kSameAsRequested',
         'cudnn_conv_algo_search': 'DEFAULT',
-        'do_copy_in_default_stream': True,
+        'cudnn_conv_use_max_workspace': '0',
+        'do_copy_in_default_stream': '1',
+        'gpu_mem_limit': str(3 * 1024 * 1024 * 1024),
     }
     selected = []
     available = onnxruntime.get_available_providers()

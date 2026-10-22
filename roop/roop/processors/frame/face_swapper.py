@@ -57,7 +57,16 @@ def post_process() -> None:
 
 
 def swap_face(source_face: Face, target_face: Face, temp_frame: Frame) -> Frame:
-    return get_face_swapper().get(temp_frame, target_face, source_face, paste_back=True)
+    try:
+        return get_face_swapper().get(temp_frame, target_face, source_face, paste_back=True)
+    except Exception as exc:
+        msg = str(exc)
+        if 'CUDA' in msg or 'CUDNN' in msg or 'EP_FAIL' in msg:
+            update_status('CUDA face-swap failed — rebuilding model on CPU...', NAME)
+            clear_face_swapper()
+            roop.globals.execution_providers = ['CPUExecutionProvider']
+            return get_face_swapper().get(temp_frame, target_face, source_face, paste_back=True)
+        raise
 
 
 def process_frame(source_face: Face, reference_face: Face, temp_frame: Frame) -> Frame:
