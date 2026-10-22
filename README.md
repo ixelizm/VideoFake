@@ -19,3 +19,7 @@ The repository provides a user-friendly and interactive Colab notebook that guid
 3. Cell **4** asks you to upload the face image and target video.
 
 Do **not** install `nvidia-cudnn` via apt — Colab already ships CUDA/cuDNN; the old package conflicts with `libcudnn9` / CUDA 13.
+
+## Related: wider head / hairline swap
+
+Face-only swap yetmezse (alın / saç çizgisi): ayrı Colab projesi → [ixelizm/VideoFake-HeadSwap](https://github.com/ixelizm/VideoFake-HeadSwap)
